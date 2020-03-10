@@ -1,0 +1,93 @@
+version: '2'
+services:
+
+{% if services.mysql.enabled %}
+  mysql:
+      container_name: edigital-mysql
+      image: "mysql:5.7"
+      volumes:
+          - ./docker/build/mysql/data:/var/lib/mysql
+          - ./docker/build/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
+      expose:
+          - 33661
+      ports:
+          - 33661:3306
+      environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 1
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ad_crm_leads
+          MYSQL_USER: symfony
+          MYSQL_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
+      networks:
+          - symfony
+{% endif %}
+{% if services.redis.enabled %}
+  redis:
+      container_name: edigital-redis
+      image: "redis:3.2"
+{% endif %}
+{% if services.elasticsearch.enabled %}
+  elasticsearch:
+      container_name: edigital-elastic
+      image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
+      expose:
+          - 9200
+      networks:
+          - symfony
+      ports:
+          - 9200:9200
+{% endif %}
+{% if services.rabbitmq.enabled %}
+  rabbitmq:
+      container_name: edigital-rabbitmq
+      image: "rabbitmq:latest"
+      volumes:
+          - "./docker/build/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+      expose:
+          - 15678
+      ports:
+          - 15678:15672
+          - 55772:5672
+      environment:
+          RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+          RABBITMQ_DEFAULT_USER: "guest"
+          RABBITMQ_DEFAULT_PASS: "guest"
+          RABBITMQ_DEFAULT_VHOST: "mainrabbit"
+      networks:
+          - symfony
+{% endif %}
+
+{#
+  #php:
+  #    container_name: edigital-php
+  #    build:
+  #        context: .
+  #        dockerfile: docker/Dockerfile-php
+  #    ports:
+  #        - 9111:9000
+  #    environment:
+  #        APP_ENV: dev
+  #        DATABASE_URL: mysql://root:root@mysql:33661/ad_crm_leads?serverVersion=5.7
+  #    volumes:
+  #        - ./:/var/www/symfony/:cached
+  #    networks:
+  #        - symfony
+  #    depends_on:
+  #        - mysql
+
+  #nginx:
+  #    image: "nginx:latest"
+  #    volumes:
+  #        - ./:/var/www/symfony/:cached
+  #        - ./docker/build/nginx/:/etc/nginx/conf.d/
+  #    ports:
+  #        - 8002:80
+  #    depends_on:
+  #        - php
+  #    networks:
+  #        - symfony
+#}
+
+networks:
+    symfony:

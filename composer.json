@@ -1,0 +1,28 @@
+{
+    "name": "klke/docker-compose-generator-bundle",
+    "description": "Generate docker-compose.yml file to test your projects",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kike",
+            "email": "kike.fernandez.reig@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Klke\\DockerComposeGeneratorBundle\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "5.0.*",
+        "twig/twig" : "^3.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    }
+}

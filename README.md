@@ -30,7 +30,13 @@ public function registerBundles()
 }
 ```
 
-In >= Symfony 4 with Symfony Flex this will be done automatically.
+If you are using Symfony 2.8, you will need to add next line to 'app/config/config.yml' file:
+
+```
+kernel.project_dir: '%kernel.root_dir%/..'
+```
+
+In >= Symfony 4 with Symfony Flex everything will be done automatically.
 
 
 ### Prerequisites

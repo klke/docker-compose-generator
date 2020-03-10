@@ -3,9 +3,11 @@
 Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated services:
 
 * Elastic Search (6.8.6)
+* Kibana (6.8.6)
 * Mysql (5.7)
 * Redis (3.2)
 * RabbitMQ (latest)
+* MongoDB (latest)
 
 ## Getting Started
 
@@ -33,7 +35,41 @@ In >= Symfony 4 with Symfony Flex this will be done automatically.
 
 ### Prerequisites
 
-To be able to run docker-compose tool you might have:
+To be able to run and use docker-compose generator, you should have installed:
 
-* Docker
-* Docker-compose tool
+* Docker: https://www.docker.com/
+* Docker-compose tool: https://github.com/docker/compose
+
+### Authorization
+
+Use next credentials in order to get access to services.
+
+####Mysql
+
+User: root
+
+Password: root
+
+Database: symfony
+
+####MongoDB
+
+User: guest
+
+Password: guest
+
+####RabbitMQ
+
+User: guest
+
+Password: guest
+
+Default vhost: mainrabbit
+
+### Database files
+
+Remember that you can find database files outsite of docker container for services:
+
+* Mysql: /docker/mysql/data
+* MongoDB: /docker/mysql/data
+

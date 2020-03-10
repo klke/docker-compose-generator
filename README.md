@@ -9,6 +9,22 @@ Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated
 * RabbitMQ (latest)
 * MongoDB (latest)
 
+##### ¿Why not Apache/Nginx and PHP? ##### 
+
+Symfony recommends to use their local web server. You can find included in their binary:
+https://symfony.com/download
+
+Once you have installed just run:
+```
+symfony server:start 
+```
+
+As an alternative you can also use php:
+```
+php -S 127.0.0.1:8009 -t public
+```
+I prefer to use symfony client, with php-cli you can experience several problems; for example with urls containing dot on parameters or parallel requests (due to single-threading).
+
 ## Getting Started
 
 Install it with:

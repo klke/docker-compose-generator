@@ -125,7 +125,7 @@ class DockerComposeGeneratorCommand extends Command
         }
     }
 
-    protected function ignoreFolders(array $files)
+    protected function gitIgnoreFolders(array $files)
     {
         $tags = array(
             '###> klke/docker-compose-generator-bundle ###',
@@ -153,9 +153,9 @@ class DockerComposeGeneratorCommand extends Command
 
             $this->fileSystem->dumpFile($gitignore, $content_processed);
         }else{
-            $this->fileSystem->appendToFile($gitignore, "\r\n{$tags[0]}\r\n{$text}\r\n$tags[1]\r\n");
+            $content .= "\r\n{$tags[0]}\r\n{$text}\r\n$tags[1]\r\n";
+            $this->fileSystem->dumpFile($gitignore, $content); //No using appendToFile method due to retrocompatibility
         }
-
     }
 
     protected function createConfigDirs()
@@ -201,7 +201,7 @@ class DockerComposeGeneratorCommand extends Command
             }
         }
 
-        $this->ignoreFolders($ignores);
+        $this->gitIgnoreFolders($ignores);
     }
 
     protected function dumpConfig($input, $output)

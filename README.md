@@ -74,7 +74,7 @@ Default vhost: mainrabbit
 
 ### Database files
 
-Remember that you can find database files outsite of docker container for services:
+Remember that you can find database files outside of docker container for services:
 
 * Mysql: /docker/mysql/data
 * MongoDB: /docker/mysql/data

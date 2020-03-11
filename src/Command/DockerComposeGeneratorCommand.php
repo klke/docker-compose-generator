@@ -137,8 +137,11 @@ class DockerComposeGeneratorCommand extends Command
             ],
         ];
 
-        $this->normalizeConfig();
-        $this->services = array_replace_recursive($this->services, $this->conf['services']);
+        if(isset($this->conf['services']))
+        {
+            $this->normalizeConfig();
+            $this->services = array_replace_recursive($this->services, $this->conf['services']);
+        }
     }
 
     protected function showTitle($output)

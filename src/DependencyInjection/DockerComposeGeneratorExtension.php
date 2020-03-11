@@ -25,6 +25,10 @@ class DockerComposeGeneratorExtension extends Extension
         $loader  = new XmlFileLoader($container, $locator);
 
         $loader->load('services.xml');
+
+        $commandService = $container->getDefinition('docker_compose_generator.command');
+        $commandService->addMethodCall('setConfig', $configs);
+
     }
 
 }

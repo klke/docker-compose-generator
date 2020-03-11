@@ -4,7 +4,7 @@ services:
 {% if services.mysql.enabled %}
   mysql:
       container_name: {{ mutex }}-mysql
-      image: "mysql:5.7"
+      image: mysql:{{ services.mysql.version }}
       volumes:
           - ./docker/mysql/data:/var/lib/mysql
           - ./docker/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
@@ -12,65 +12,71 @@ services:
           - 33661
       ports:
           - {{ services.mysql.port }}:3306
-      environment:
-          MYSQL_ALLOW_EMPTY_PASSWORD: 1
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: symfony
-          MYSQL_USER: symfony
-          MYSQL_PASSWORD: root
-          MYSQL_ROOT_HOST: "%"
       networks:
           - symfony
+      {% if services.mysql.options|length > 0 %}environment:{% endif %}
+
+      {% for key, value in services.mysql.options %}
+      - {{ key }}={{ value }}
+      {% endfor %}
 {% endif %}
 
 {% if services.redis.enabled %}
   redis:
       container_name: {{ mutex }}-redis
-      image: "redis:3.2"
+      image: redis:{{ services.redis.version }}
       expose:
           - {{ services.redis.port }}
       ports:
           - {{ services.redis.port }}:6379
       networks:
           - symfony
+      {% if services.redis.options|length > 0 %}environment:{% endif %}
+
+      {% for key, value in services.redis.options %}
+      - {{ key }}={{ value }}
+      {% endfor %}
 {% endif %}
 
 {% if services.elasticsearch.enabled %}
   elasticsearch:
         container_name: {{ mutex }}-elastic
-        image: "docker.elastic.co/elasticsearch/elasticsearch:6.8.5"
+        image: docker.elastic.co/elasticsearch/elasticsearch:{{ services.elasticsearch.version }}
         expose:
           - {{ services.elasticsearch.port }}
         ports:
           - {{ services.elasticsearch.port }}:9200
         networks:
           - symfony
+        {% if services.elasticsearch.options|length > 0 %}environment:{% endif %}
+
+        {% for key, value in services.elasticsearch.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
 {% endif %}
 
 {% if services.kibana.enabled %}
   kibana:
         container_name: {{ mutex }}-kibana
-        image: docker.elastic.co/kibana/kibana:6.8.6
-        environment:
-              SERVER_HOST: localhost
-              ELASTICSEARCH_HOSTS: http://elasticsearch:{{ services.elasticsearch.port }}
+        image: docker.elastic.co/kibana/kibana:{{ services.kibana.version }}
         expose:
           - {{ services.kibana.port }}
         ports:
           - {{ services.kibana.port }}:5601
         depends_on:
           - elasticsearch
+        {% if services.kibana.options|length > 0 %}environment:{% endif %}
+
+        {% for key, value in services.kibana.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
+        - ELASTICSEARCH_HOSTS=http://elasticsearch:{{ services.elasticsearch.port }}
 {% endif %}
 
 {% if services.mongodb.enabled %}
   mongodb:
         container_name: {{ mutex }}-mongodb
-        image: mongo:latest
-        environment:
-           - MONGO_DATA_DIR=/data/db
-           - MONGO_LOG_DIR=/dev/null
-           - MONGODB_USER="guest"
-           - MONGODB_PASS="guest"
+        image: mongo:{{ services.mongodb.version }}
         volumes:
            - ./docker/mongodb/data/db:/data/db
         expose:
@@ -80,12 +86,18 @@ services:
         command: mongod --smallfiles --logpath=/dev/null # --quiet
         networks:
           - symfony
+        {% if services.mongodb.options|length > 0 %}environment:{% endif %}
+
+        {% for key, value in services.mongodb.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
+
 {% endif %}
 
 {% if services.rabbitmq.enabled %}
   rabbitmq:
         container_name: {{ mutex }}-rabbitmq
-        image: "rabbitmq:latest"
+        image: rabbitmq:{{ services.rabbitmq.version }}
         volumes:
           - "./docker/rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"
         expose:
@@ -93,13 +105,14 @@ services:
         ports:
           - {{ services.rabbitmq.extra_ports.rabbitmq_manager }}:15672
           - {{ services.rabbitmq.port }}:5672
-        environment:
-          RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
-          RABBITMQ_DEFAULT_USER: "guest"
-          RABBITMQ_DEFAULT_PASS: "guest"
-          RABBITMQ_DEFAULT_VHOST: "mainrabbit"
         networks:
           - symfony
+        {% if services.rabbitmq.options|length > 0 %}environment:{% endif %}
+
+        {% for key, value in services.rabbitmq.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
+
 {% endif %}
 
 networks:

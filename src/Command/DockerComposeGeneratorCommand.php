@@ -15,47 +15,13 @@ use Twig\Environment as Twig;
  */
 class DockerComposeGeneratorCommand extends Command
 {
-    protected $twig, $fileSystem, $rootPath, $services;
+    protected $twig, $fileSystem, $conf, $rootPath, $services;
 
     public function __construct($rootPath, Twig $twig)
     {
         $this->twig = $twig;
         $this->rootPath = $rootPath;
         $this->fileSystem = new Filesystem();
-        $this->services = [
-            'mysql' => [
-                'enabled' => false,
-                'port' => 3306,
-                'extra_ports' => []
-            ],
-            'redis' => [
-                'enabled' => false,
-                'port' => 6379,
-                'extra_ports' => []
-            ],
-            'mongodb' => [
-                'enabled' => false,
-                'port' => 27017,
-                'extra_ports' => []
-            ],
-            'elasticsearch' => [
-                'enabled' => false,
-                'port' => 9200,
-                'extra_ports' => []
-            ],
-            'kibana' => [
-                'enabled' => false,
-                'port' => 5601,
-                'extra_ports' => []
-            ],
-            'rabbitmq' => [
-                'enabled' => false,
-                'port' => 5672,
-                'extra_ports' => [
-                    'rabbitmq_manager' => 15672
-                ]
-            ],
-        ];
 
         parent::__construct();
     }
@@ -65,6 +31,114 @@ class DockerComposeGeneratorCommand extends Command
         $this->setName('docker-compose:generate')
             ->setDescription('Generador de entornos docker')
         ;
+    }
+
+    protected function normalizeConfig()
+    {
+        foreach($this->conf['services'] as $key => $service)
+        {
+            if(!isset($service['extra_ports']))
+            {
+                continue;
+            }
+
+            $tmp = [];
+            foreach($service['extra_ports'] as $port)
+            {
+                $tmp[$port['name']] = $port['port'];
+            }
+            unset($this->conf['services'][$key]['extra_ports']);
+            $this->conf['services'][$key]['extra_ports'] = $tmp;
+        }
+
+        foreach($this->conf['services'] as $key => $service)
+        {
+            if(!isset($service['options']))
+            {
+                continue;
+            }
+
+            $tmp = [];
+            foreach($service['options'] as $option)
+            {
+                $tmp[$option['name']] = $option['value'];
+            }
+            unset($this->conf['services'][$key]['options']);
+            $this->conf['services'][$key]['options'] = $tmp;
+        }
+    }
+
+    public function setConfig($conf)
+    {
+        $this->conf = $conf;
+        $this->services = [
+            'mysql' => [
+                'enabled' => false,
+                'version' => '5.7',
+                'port' => 3306,
+                'extra_ports' => [],
+                'options' => [
+                    'MYSQL_USER' => 'symfony',
+                    'MYSQL_PASSWORD' => 'root',
+                    'MYSQL_ALLOW_EMPTY_PASSWORD' => 1,
+                    'MYSQL_ROOT_PASSWORD' => 'root',
+                    'MYSQL_DATABASE' => 'symfony',
+                    'MYSQL_ROOT_HOST' => '%',
+                ]
+            ],
+            'redis' => [
+                'enabled' => false,
+                'version' => '3.2',
+                'port' => 6379,
+                'extra_ports' => [],
+                'options' => []
+            ],
+            'mongodb' => [
+                'enabled' => false,
+                'version' => 'latest',
+                'port' => 27017,
+                'extra_ports' => [],
+                'options' => [
+                    'MONGO_DATA_DIR' => '/data/db',
+                    'MONGO_LOG_DIR' => '/dev/null',
+                    'MONGODB_USER' => 'symfony',
+                    'MONGODB_PASS' => 'root',
+                ]
+            ],
+            'elasticsearch' => [
+                'enabled' => false,
+                'version' => '6.8.6',
+                'port' => 9200,
+                'extra_ports' => [],
+                'options' => []
+            ],
+            'kibana' => [
+                'enabled' => false,
+                'version' => '6.8.6',
+                'port' => 5601,
+                'extra_ports' => [],
+                'options' => [
+                    'SERVER_HOST' => 'localhost',
+                ]
+            ],
+            'rabbitmq' => [
+                'enabled' => false,
+                'version' => 'latest',
+                'port' => 5672,
+                'extra_ports' => [
+                    'rabbitmq_manager' => 15672
+                ],
+                'options' => [
+                    'RABBITMQ_ERLANG_COOKIE' => 'SWQOKODSQALRPCLNMEQG',
+                    'RABBITMQ_DEFAULT_USER' => 'guest',
+                    'RABBITMQ_DEFAULT_PASS' => 'guest',
+                    'RABBITMQ_DEFAULT_VHOST' => 'mainrabbit',
+                ]
+            ],
+        ];
+
+        $this->normalizeConfig();
+        $this->services = array_replace_recursive($this->services, $this->conf['services']);
     }
 
     protected function showTitle($output)

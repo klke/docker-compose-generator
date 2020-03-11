@@ -54,6 +54,49 @@ kernel.project_dir: '%kernel.root_dir%/..'
 
 In >= Symfony 4 with Symfony Flex everything will be done automatically.
 
+### Configuration
+
+You can customize image versions, passwords and many other options placing next configuration on 'config/packages/docker_compose_generator.yaml':
+
+```
+docker_compose_generator:
+    services:
+        mysql:
+            version: 8
+            port: 3306
+            options:
+                - { name: MYSQL_USER, value: symfony }
+                - { name: MYSQL_PASSWORD, value: root }
+
+        redis:
+            version: 3.2
+            port: 6379
+
+        mongodb:
+            version: latest
+            port: 27017
+            options:
+                - { name: MONGODB_USER, value: guest }
+                - { name: MONGODB_PASS, value: guest }
+
+        elasticsearch:
+            version: 6.8.5
+            port: 9200
+
+        kibana:
+            version: 6.8.6
+            port: 5601
+
+        rabbitmq:
+            version: latest
+            port: 5672
+            extra_ports:
+                - {name: rabbitmq_manager, port: 15672}
+            options:
+                - { name: RABBITMQ_DEFAULT_USER, value: guest }
+                - { name: RABBITMQ_DEFAULT_PASS, value: guest }
+                - { name: RABBITMQ_DEFAULT_VHOST, value: mainrabbit }
+```
 
 ### Prerequisites
 

@@ -271,7 +271,9 @@ class DockerComposeGeneratorCommand extends Command
 
     protected function createConfigDirs()
     {
-        $ignores = [];
+        $ignores = [
+            '/docker/'
+        ];
 
         foreach($this->services as $serviceName => $data)
         {
@@ -286,7 +288,6 @@ class DockerComposeGeneratorCommand extends Command
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/nginx/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/nginx/logs");
-                    $ignores[] = '/docker/nginx/logs/*';
                     $this->fileSystem->dumpFile(
                         "{$this->rootPath}/docker/nginx/default.conf",
                         $this->twig->render('@DockerComposeGenerator\config\nginx.default.conf.twig', [
@@ -300,14 +301,12 @@ class DockerComposeGeneratorCommand extends Command
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/php/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/php/logs");
-                    $ignores[] = '/docker/php/logs/*';
                     break;
 
                 case 'mysql':
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/mysql/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/mysql/data/");
-                    $ignores[] = '/docker/mysql/data/*';
                     $this->fileSystem->dumpFile(
                         "{$this->rootPath}/docker/mysql/mysqld.cnf",
                         $this->twig->render('@DockerComposeGenerator\config\mysqld.conf.twig')
@@ -318,13 +317,10 @@ class DockerComposeGeneratorCommand extends Command
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/mongodb/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/mongodb/data/");
-                    $ignores[] = '/docker/mongodb/data/*';
                     break;
 
                 case 'rabbitmq':
-
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/rabbitmq", 0775);
-
                     $this->fileSystem->dumpFile(
                         "{$this->rootPath}/docker/rabbitmq/enabled_plugins",
                         '[rabbitmq_management, rabbitmq_management_visualiser].'

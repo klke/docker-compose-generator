@@ -160,6 +160,17 @@ services:
 
 {% endif %}
 
+{% if services.mailcatcher.enabled %}
+    mailcatcher:
+        restart: on-failure:10
+        image: dockage/mailcatcher:0.7.1
+        ports:
+          - {{ services.mailcatcher.extra_ports.webmail }}:1080
+          - {{ services.mailcatcher.port }}:1025
+        networks:
+          - symfony
+{% endif %}
+
 networks:
     symfony:
         driver: bridge

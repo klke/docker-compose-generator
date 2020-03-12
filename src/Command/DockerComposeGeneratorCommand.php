@@ -151,6 +151,14 @@ class DockerComposeGeneratorCommand extends Command
                     'RABBITMQ_DEFAULT_VHOST' => 'mainrabbit',
                 ]
             ],
+            'mailcatcher' => [
+                'enabled' => false,
+                'version' => 'latest',
+                'port' => 1025,
+                'extra_ports' => [
+                    'webmail' => 1080
+                ]
+            ],
         ];
 
         if(isset($this->conf['services']))

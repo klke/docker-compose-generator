@@ -14,6 +14,7 @@ Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated
 * Redis (3.2)
 * RabbitMQ (latest)
 * MongoDB (latest)
+* Mailcatcher (latest)
 
 ##### ¿Why not to use Symfony-cli server? ##### 
 

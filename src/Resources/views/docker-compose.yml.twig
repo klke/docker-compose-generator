@@ -1,45 +1,90 @@
 version: '2'
 services:
 
+{% if services.nginx.enabled %}
+    nginx:
+        image: nginx:{{ services.nginx.version }}
+        container_name: {{ mutex }}-nginx
+        ports:
+            - {{ services.nginx.port }}:80
+        networks:
+          - symfony
+
+        {% if services.php.enabled %}
+
+        depends_on:
+            - php
+        {% endif %}
+
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./:/var/www/symfony:cached
+            - ./docker/nginx/logs:/var/log/nginx:cached
+
+{% endif %}
+
+{% if services.php.enabled %}
+    php:
+        image: php:{{ services.php.version }}
+        container_name: {{ mutex }}-php-fpm
+        ports:
+            - {{ services.php.port }}:9000
+        networks:
+          - symfony
+        volumes:
+            - ./:/var/www/symfony:cached
+            - ./docker/php/logs:/var/www/symfony/var/log:cached
+        environment:
+            XDEBUG_CONFIG: remote_host=host.docker.internal remote_port={{ services.php.port }} remote_enable=1
+        {% if services.mysql.enabled %}
+
+        depends_on:
+            - mysql
+        {% endif %}
+
+
+
+{% endif %}
+
 {% if services.mysql.enabled %}
-  mysql:
-      container_name: {{ mutex }}-mysql
-      image: mysql:{{ services.mysql.version }}
-      volumes:
+    mysql:
+        container_name: {{ mutex }}-mysql
+        image: mysql:{{ services.mysql.version }}
+        volumes:
           - ./docker/mysql/data:/var/lib/mysql
           - ./docker/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
-      expose:
-          - 33661
-      ports:
+        expose:
+          - {{ services.mysql.port }}
+        ports:
           - {{ services.mysql.port }}:3306
-      networks:
+        networks:
           - symfony
-      {% if services.mysql.options|length > 0 %}environment:{% endif %}
+        {% if services.mysql.options|length > 0 %}environment:{% endif %}
 
-      {% for key, value in services.mysql.options %}
-      - {{ key }}={{ value }}
-      {% endfor %}
+        {% for key, value in services.mysql.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
 {% endif %}
 
 {% if services.redis.enabled %}
-  redis:
-      container_name: {{ mutex }}-redis
-      image: redis:{{ services.redis.version }}
-      expose:
+    redis:
+        container_name: {{ mutex }}-redis
+        image: redis:{{ services.redis.version }}
+        expose:
           - {{ services.redis.port }}
-      ports:
+        ports:
           - {{ services.redis.port }}:6379
-      networks:
+        networks:
           - symfony
-      {% if services.redis.options|length > 0 %}environment:{% endif %}
+        {% if services.redis.options|length > 0 %}environment:{% endif %}
 
-      {% for key, value in services.redis.options %}
-      - {{ key }}={{ value }}
-      {% endfor %}
+        {% for key, value in services.redis.options %}
+        - {{ key }}={{ value }}
+        {% endfor %}
 {% endif %}
 
 {% if services.elasticsearch.enabled %}
-  elasticsearch:
+    elasticsearch:
         container_name: {{ mutex }}-elastic
         image: docker.elastic.co/elasticsearch/elasticsearch:{{ services.elasticsearch.version }}
         expose:
@@ -56,7 +101,7 @@ services:
 {% endif %}
 
 {% if services.kibana.enabled %}
-  kibana:
+    kibana:
         container_name: {{ mutex }}-kibana
         image: docker.elastic.co/kibana/kibana:{{ services.kibana.version }}
         expose:
@@ -74,7 +119,7 @@ services:
 {% endif %}
 
 {% if services.mongodb.enabled %}
-  mongodb:
+    mongodb:
         container_name: {{ mutex }}-mongodb
         image: mongo:{{ services.mongodb.version }}
         volumes:
@@ -95,7 +140,7 @@ services:
 {% endif %}
 
 {% if services.rabbitmq.enabled %}
-  rabbitmq:
+    rabbitmq:
         container_name: {{ mutex }}-rabbitmq
         image: rabbitmq:{{ services.rabbitmq.version }}
         volumes:

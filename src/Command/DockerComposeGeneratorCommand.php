@@ -72,6 +72,22 @@ class DockerComposeGeneratorCommand extends Command
     {
         $this->conf = $conf;
         $this->services = [
+            'nginx' => [
+                'enabled' => false,
+                'version' => 'latest',
+                'port' => 80,
+                'extra_ports' => [],
+                'options' => [
+                    'HOST_NAME' => 'localhost',
+                ]
+            ],
+            'php' => [
+                'enabled' => false,
+                'version' => '7.4-fpm',
+                'port' => 9000,
+                'extra_ports' => [],
+                'options' => []
+            ],
             'mysql' => [
                 'enabled' => false,
                 'version' => '5.7',
@@ -235,6 +251,16 @@ class DockerComposeGeneratorCommand extends Command
         }
     }
 
+    protected function getEntryPoint()
+    {
+        if($this->fileSystem->exists("{$this->rootPath}/public/index.php"))
+        {
+            return ['folder' => 'public', 'file' => 'index', 'extension' => 'php'];
+        }
+
+        return ['folder' => 'web', 'file' => 'app', 'extension' => 'php'];
+    }
+
     protected function createConfigDirs()
     {
         $ignores = [];
@@ -248,6 +274,27 @@ class DockerComposeGeneratorCommand extends Command
 
             switch ($serviceName)
             {
+                case 'nginx':
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/nginx/", 0775);
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/nginx/logs");
+                    $ignores[] = '/docker/nginx/logs/*';
+                    $this->fileSystem->dumpFile(
+                        "{$this->rootPath}/docker/nginx/default.conf",
+                        $this->twig->render('@DockerComposeGenerator\config\nginx.default.conf.twig', [
+                            'data' => $data,
+                            'entrypoint' =>  $this->getEntryPoint()
+                        ])
+                    );
+                    break;
+
+                case 'php':
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/php/", 0775);
+                    $this->fileSystem->mkdir("{$this->rootPath}/docker/php/logs");
+                    $ignores[] = '/docker/php/logs/*';
+                    break;
+
                 case 'mysql':
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/", 0775);
                     $this->fileSystem->mkdir("{$this->rootPath}/docker/mysql/", 0775);
@@ -255,7 +302,7 @@ class DockerComposeGeneratorCommand extends Command
                     $ignores[] = '/docker/mysql/data/*';
                     $this->fileSystem->dumpFile(
                         "{$this->rootPath}/docker/mysql/mysqld.cnf",
-                        $this->twig->render('@DockerComposeGenerator\mysqld.cnf.twig')
+                        $this->twig->render('@DockerComposeGenerator\config\mysqld.conf.twig')
                     );
                     break;
 

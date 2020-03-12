@@ -102,6 +102,12 @@ docker_compose_generator:
                 - { name: RABBITMQ_DEFAULT_USER, value: guest }
                 - { name: RABBITMQ_DEFAULT_PASS, value: guest }
                 - { name: RABBITMQ_DEFAULT_VHOST, value: mainrabbit }
+
+        mailcatcher:
+            version: latest
+            port: 1025
+            extra_ports:
+                - {name: webmail, port: 1080}
 ```
 
 ### Prerequisites

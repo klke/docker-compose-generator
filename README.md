@@ -1,8 +1,10 @@
 # docker-compose-generator
 
+Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated services:
+
 ![alt text](https://i.imgur.com/r257GPD.gif)
 
-Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated services:
+## Services
 
 * Nginx (latest)
 * Php-fpm (7.4)

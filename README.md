@@ -6,15 +6,15 @@ Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated
 
 ## Services
 
-* Nginx (latest)
-* Php-fpm (7.4)
-* Elastic Search (6.8.6)
-* Kibana (6.8.6)
-* Mysql (5.7)
-* Redis (3.2)
-* RabbitMQ (latest)
-* MongoDB (latest)
-* Mailcatcher (latest)
+* Nginx
+* Php-fpm
+* Elastic Search
+* Kibana
+* Mysql
+* Redis
+* RabbitMQ
+* MongoDB
+* Mailcatcher
 
 ##### ¿Why not to use Symfony-cli server? ##### 
 

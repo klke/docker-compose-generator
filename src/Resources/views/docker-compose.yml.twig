@@ -128,7 +128,7 @@ services:
            - {{ services.mongodb.port }}
         ports:
            - {{ services.mongodb.port }}:27017
-        command: mongod --smallfiles --logpath=/dev/null # --quiet
+        command: mongod --logpath=/dev/null # --quiet
         networks:
           - symfony
         {% if services.mongodb.options|length > 0 %}environment:{% endif %}

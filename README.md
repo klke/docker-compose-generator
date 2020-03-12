@@ -2,6 +2,8 @@
 
 Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated services:
 
+* Nginx (latest)
+* Php-fpm (7.4)
 * Elastic Search (6.8.6)
 * Kibana (6.8.6)
 * Mysql (5.7)
@@ -9,21 +11,10 @@ Command-line Symfony tool to generate 'docker-compose.yml' with pre-configurated
 * RabbitMQ (latest)
 * MongoDB (latest)
 
-##### ¿Why not Apache/Nginx and PHP? ##### 
+##### ¿Why not to use Symfony-cli server? ##### 
 
-Symfony recommends to use their local web server. You can find included in their binary:
-https://symfony.com/download
-
-Once you have installed just run:
-```
-symfony server:start 
-```
-
-As an alternative you can also use php:
-```
-php -S 127.0.0.1:8009 -t public
-```
-I prefer to use symfony client, with php-cli you can experience several problems; for example with urls containing dot on parameters or parallel requests (due to single-threading).
+To test different versions of php on Symfony-cli server, you must have all installed on your pc so is not comfortable.
+With docker-compose-generator you can change version easily from "docker_compose_generator.yaml".
 
 ## Getting Started
 
@@ -61,6 +52,16 @@ You can customize image versions, passwords and many other options placing next 
 ```
 docker_compose_generator:
     services:
+        nginx:
+            version: latest
+            port: 8087
+            options:
+                - { name: HOST_NAME, value: localhost }
+
+        php:
+            version: 7.2-fpm
+            port: 9011
+    
         mysql:
             version: 8
             port: 3306
@@ -104,32 +105,6 @@ To be able to run and use docker-compose generator, you should have installed:
 
 * Docker: https://www.docker.com/
 * Docker-compose tool: https://github.com/docker/compose
-
-### Authorization
-
-Use next credentials in order to get access to services.
-
-####Mysql
-
-User: root
-
-Password: root
-
-Database: symfony
-
-####MongoDB
-
-User: guest
-
-Password: guest
-
-####RabbitMQ
-
-User: guest
-
-Password: guest
-
-Default vhost: mainrabbit
 
 ### Database files
 
